@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU QUERO VOLTAR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            cursor: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            html, body { cursor: auto; }
+            #cursor { display: none; }
+        }
+
+        /* Fundo com efeitos VHS */
+        #bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: contrast(1.2) saturate(0.7) brightness(0.9);
+        }
+
+        #scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #noise {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 3;
+            animation: noiseMove 0.2s steps(10) infinite;
+        }
+
+        @keyframes noiseMove {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(-5%,-10%); }
+            50% { transform: translate(-15%,5%); }
+            75% { transform: translate(7%,-25%); }
+            100% { transform: translate(0,0); }
+        }
+
+        #vignette {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        /* Conteúdo centralizado */
+        #content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            gap: 0;
+        }
+
+        #logo {
+            width: clamp(80px, 15vw, 120px);
+            margin-bottom: 20px;
+            mix-blend-mode: overlay;
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        #previa {
+            font-family: 'Old Standard TT', serif;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        #previa.escondido { opacity: 0; }
+
+        #volume-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #volume-indicator.tocando { opacity: 1; }
+
+        .vol-bar {
+            width: 4px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 2px;
+            animation: volPulse 0.8s ease-in-out infinite alternate;
+        }
+
+        .vol-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+        .vol-bar:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+        .vol-bar:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+        .vol-bar:nth-child(4) { height: 18px; animation-delay: 0.45s; }
+        .vol-bar:nth-child(5) { height: 6px; animation-delay: 0.6s; }
+
+        @keyframes volPulse {
+            0% { transform: scaleY(0.4); opacity: 0.5; }
+            100% { transform: scaleY(1); opacity: 1; }
+        }
+
+        #vol-text {
+            font-family: 'Old Standard TT', serif;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 1px;
+        }
+
+        #texto {
+            font-family: 'Old Standard TT', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            letter-spacing: 4px;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        #btn-ouca {
+            margin-top: 40px;
+            font-family: 'Old Standard TT', serif;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            padding: 14px 36px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            cursor: none;
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            #btn-ouca { cursor: pointer; }
+        }
+
+        #btn-ouca:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.35);
+            box-shadow: 0 4px 30px rgba(255,255,255,0.1);
+        }
+
+        /* Cursor glassmorphism */
+        #cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 0 12px rgba(255,255,255,0.05);
+            transition: transform 0.15s ease;
+        }
+
+        @media (max-width: 600px) {
+            #btn-ouca { padding: 12px 28px; }
+            .vol-bar { width: 3px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="bg">
+        <video id="video" autoplay muted loop playsinline>
+            <source src="VID-20260621-WA0052.mp4" type="video/mp4">
+        </video>
+        <div id="scanlines"></div>
+        <div id="noise"></div>
+        <div id="vignette"></div>
+    </div>
+
+    <div id="content">
+        <img id="logo" src="logo.svg" alt="Logo">
+        <div id="previa">clique na tela e ouça uma prévia</div>
+        <div id="volume-indicator">
+            <div class="vol-bar"></div>
+            <div class="vol-bar"></div>
+            <div class="vol-bar"></div>
+            <div class="vol-bar"></div>
+            <div class="vol-bar"></div>
+            <div id="vol-text">aumente o volume</div>
+        </div>
+        <div id="texto">EU QUERO VOLTAR</div>
+        <a id="btn-ouca" href="https://www.youtube.com/@trigonometriaoficial" target="_blank">Ouça agora</a>
+    </div>
+
+    <div id="cursor"></div>
+    <audio id="musica" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const musica = document.getElementById('musica');
+        const previa = document.getElementById('previa');
+
+        function tocarMusica() {
+            musica.volume = 0;
+            musica.play().then(() => {
+                previa.classList.add('escondido');
+                document.getElementById('volume-indicator').classList.add('tocando');
+                let vol = 0;
+                const fade = setInterval(() => {
+                    vol += 0.025;
+                    if (vol >= 1) { musica.volume = 1; clearInterval(fade); }
+                    else { musica.volume = vol; }
+                }, 100);
+            }).catch(() => {});
+        }
+
+        tocarMusica();
+
+        let audioLiberado = false;
+        document.addEventListener('click', () => {
+            if (!audioLiberado) { audioLiberado = true; tocarMusica(); }
+        }, { once: true });
+
+        // Canvas noise
+        const noise = document.getElementById('noise');
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+
+        function drawNoise() {
+            const imgData = ctx.createImageData(256, 256);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+                const v = Math.random() * 255;
+                d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 255;
+            }
+            ctx.putImageData(imgData, 0, 0);
+            noise.style.backgroundImage = `url(${canvas.toDataURL()})`;
+            requestAnimationFrame(drawNoise);
+        }
+        drawNoise();
+
+        // Cursor
+        const cursor = document.getElementById('cursor');
+        const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+        if (!isMobile) {
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+            document.addEventListener('mousedown', () => {
+                cursor.style.transform = 'translate(-50%,-50%) scale(0.85)';
+            });
+            document.addEventListener('mouseup', () => {
+                cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+            });
+            const btn = document.getElementById('btn-ouca');
+            btn.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'translate(-50%,-50%) scale(1.4)';
+                cursor.style.background = 'rgba(255,255,255,0.15)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+                cursor.style.background = 'rgba(255,255,255,0.08)';
+            });
+        }
+    </script>
+</body>
+</html>
